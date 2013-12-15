@@ -6,5 +6,7 @@
   },
 
   "userid" : "",
-  "password" : ""
+  "password" : "",
+
+  "accounts": ["1", "2"]
 }

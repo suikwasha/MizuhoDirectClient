@@ -7,6 +7,7 @@ var MIZUHO_DIRECT_URL_ENTER_USERID = "https://web.ib.mizuhobank.co.jp/servlet/mi
 **/
 
 var casper = require('casper').create();
+
 var configFile = require('fs').read('./config.json');
 var config = JSON.parse(configFile);
 
@@ -23,7 +24,7 @@ casper.then(function() {
  合言葉画面ではない場合, パスワード入力画面にスキップする.
 **/
 casper.thenBypassIf(function() {
-  this.getCurrentUrl().indexOf("Emf000100") == -1;
+  return this.getCurrentUrl().indexOf("Emf00100") == -1;
 }, 2);
 
 /**
@@ -38,7 +39,12 @@ casper.repeat(2, function(){
     }
   });
 
-  this.fill('form', {rskAns: config.questions[q]}, true);
+  // <input type="checkbox" name="rskPCResistCHK" value="CHECK">
+  if(document.querySelector('input[name="rskPCResistCHK"]') != null){
+    this.fill('form', {rskAns: config.questions[q], rskPCResistCHK: true}, true);
+  }else{
+    this.fill('form', {rskAns: config.questions[q]}, true);
+  }
 });
 
 /**
@@ -47,6 +53,8 @@ casper.repeat(2, function(){
 casper.then(function() {
   this.fill('form', {Anshu1No: config.password}, true);
 });
+
+casper.waitForUrl(/Emf02000/);
 
 /**
   現在残高を取得して表示
@@ -61,7 +69,8 @@ casper.then(function() {
   }
   return "-1";
  });
- this.echo(amount);
+
+ require("utils").dump({"balance": "" + amount + ""});
 });
 
 /**
