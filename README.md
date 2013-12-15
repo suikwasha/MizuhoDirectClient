@@ -10,4 +10,10 @@ MizuhoDirectClient using CasperJS
  1. secret questions and their answers
  2. username
  3. password
-3. execute `casperjs mizuho_amount.js`
+ 4. accounts (account number)
+
+#### mizuho_balance.js
+3. execute `casperjs mizuho_balance.js`
+
+#### mizuho_statement.js
+3. execute `casperjs mizuho_statement.js`
