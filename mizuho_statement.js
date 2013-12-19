@@ -1,63 +1,13 @@
-var MIZUHO_DIRECT_URL_ENTER_USERID = "https://web.ib.mizuhobank.co.jp/servlet/mib?xtr=Emf00000";
-
 var casper = require('casper').create();
 
 var configFile = require('fs').read('./config.json');
 var config = JSON.parse(configFile);
 
-casper.start(MIZUHO_DIRECT_URL_ENTER_USERID);
-
-/**
-  ユーザーIDの入力
-**/
-casper.then(function() {
-  var me = this;
-  this.page.onConsoleMessage = function(msg, line, source) {
-    me.log(msg, 'debug');
-  }
-  this.fill('form', {KeiyakuNo: config.userid}, true);
-});
-
-/**
- 合言葉画面ではない場合, パスワード入力画面にスキップする.
-**/
-casper.thenBypassIf(function() {
-  return this.getCurrentUrl().indexOf("Emf00100") == -1;
-}, 2);
-
-/**
- 合言葉を2回入力する.
-**/
-casper.repeat(2, function(){
-  var text = this.fetchText('div');
-  var q = '';
-  Object.keys(config.questions).forEach(function(key){
-    if(text.indexOf(key) != -1){
-      q = key;
-    }
-  });
-
-  // <input type="checkbox" name="rskPCResistCHK" value="CHECK">
-  if(document.querySelector('input[name="rskPCResistCHK"]') != null){
-    this.fill('form', {rskAns: config.questions[q], rskPCResistCHK: true}, true);
-  }else{
-    this.fill('form', {rskAns: config.questions[q]}, true);
-  }
-});
-
-/**
- login
-**/
-casper.then(function() {
-  this.fill('form', {Anshu1No: config.password}, true);
-});
-
-casper.waitForUrl(/Emf02000/);
+require('mizuho_login').apply(casper, config);
 
 casper.then(function(){
   this.click('a[id="MB_R011N040"]');
 });
-
 
 casper.then(function() {
   var target = this.evaluate(function(accountNumber) {
@@ -114,10 +64,7 @@ casper.then(function() {
   require('utils').dump(records); 
 });
 
-/**
-  ログアウト
-**/
-casper.thenOpen("https://web1.ib.mizuhobank.co.jp/servlet/mib?xtr=EmfLogOff&NLS=JP");
+require('mizuho_logout').apply(casper, config);
 
 casper.run(function(){
   casper.exit();
