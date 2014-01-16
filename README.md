@@ -13,9 +13,12 @@ MizuhoDirectClient using CasperJS
  4. accounts (account number)
 
 #### mizuho_balance.js
-3. execute `casperjs mizuho_balance.js`
+1. execute `casperjs mizuho_balance.js`
 
 #### mizuho_statement.js
 3. execute `casperjs mizuho_statement.js`
  - you can specify range like below
    `casperjs mizuho_statement.js "2013/12/31" "2014/1/10"`
+
+#### mizuho_accounts.js
+1. execute `casperjs mizuho_accounts.js`
