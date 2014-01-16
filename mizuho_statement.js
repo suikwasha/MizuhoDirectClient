@@ -1,7 +1,19 @@
-var casper = require('casper').create();
+var casper = require('casper').create({
+  verbose: true,
+  logLevel: 'error'
+});
 
 var configFile = require('fs').read('./config.json');
 var config = JSON.parse(configFile);
+
+
+if(casper.cli.args.length >= 2){
+  var args = casper.cli.args;
+  if(isNaN(Date.parse(args[0])) || isNaN(Date.parse(args[1]))){
+    casper.log('invalid arguments, failed to parse date string', 'error');
+    casper.exit(1);
+  }
+}
 
 require('mizuho_login').apply(casper, config);
 
@@ -21,7 +33,22 @@ casper.then(function() {
     }
     return "-1";
   }, config.accounts[0]);
-  
+
+  if(casper.cli.args.length >= 2){
+    var from = new Date(casper.cli.args[0]); 
+    var to = new Date(casper.cli.args[1]); 
+
+    this.fill('form[name="FORM1"]', {INQUIRY_TYPE: "RANGE"}, false);
+    this.fill('form[name="FORM1"]', {
+      SFYear: from.getFullYear(),
+      SFMonth: from.getMonth() + 1,
+      SFDay: from.getDate()}, false);
+    this.fill('form[name="FORM1"]', {
+      STYear: to.getFullYear(),
+      STMonth: to.getMonth() + 1,
+      STDay: to.getDate()}, false);
+  }
+
   if(target == "-1"){
     this.log("error account number not found.", "error");
   }else{
@@ -61,7 +88,10 @@ casper.then(function() {
     return ret;
   });
 
-  require('utils').dump(records); 
+  var output = {};
+  output[config.accounts[0]] = records;
+
+  require('utils').dump(output); 
 });
 
 require('mizuho_logout').apply(casper, config);

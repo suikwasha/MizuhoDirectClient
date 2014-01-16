@@ -17,3 +17,5 @@ MizuhoDirectClient using CasperJS
 
 #### mizuho_statement.js
 3. execute `casperjs mizuho_statement.js`
+ - you can specify range like below
+   `casperjs mizuho_statement.js "2013/12/31" "2014/1/10"`
